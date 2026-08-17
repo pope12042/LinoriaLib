@@ -3506,6 +3506,18 @@ do
                 ZIndex = 6;
                 Parent = Outer;
             })
+    -- Center Background Image
+    Library.CenterImage = Library:Create("ImageLabel", {
+        BackgroundTransparency = 1;
+        Position = UDim2.new(0.5, 0, 0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        Size = UDim2.new(0, 200, 0, 200); -- Adjust size here
+        Image = "rbxassetid://124796893161306"; -- Replace with your image ID
+        ImageTransparency = 0.6; -- Adjust transparency (0 = visible, 1 = invisible)
+        ScaleType = Enum.ScaleType.Fit;
+        ZIndex = 0; -- Puts it behind the tabs
+        Parent = Inner;
+    })
 
             local Label = Library:CreateLabel({
                 Size = UDim2.new(1, 0, 1, 0);
@@ -6634,6 +6646,19 @@ function Library:CreateWindow(...)
         Size = UDim2.new(0, 0, 0, 25);
         Text = WindowInfo.Title or "";
         TextXAlignment = Enum.TextXAlignment.Left;
+        ZIndex = 1;
+        Parent = Inner;
+    })
+    -- Game Experience Label (Top Right)
+    local GameInfo = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+    local GameName = GameInfo and GameInfo.Name or "Unknown Game"
+    
+    Library.GameLabel = Library:CreateLabel({
+        Position = UDim2.new(1, -7, 0, 0);
+        Size = UDim2.new(0, 0, 0, 25);
+        Text = GameName;
+        TextXAlignment = Enum.TextXAlignment.Right;
+        TextColor3 = Color3.fromRGB(100, 200, 255); -- Light blue like your screenshot
         ZIndex = 1;
         Parent = Inner;
     })
