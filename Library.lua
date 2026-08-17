@@ -81,47 +81,6 @@ ModalElement.ZIndex = -999
 ModalElement.Parent = ScreenGui
 
 local LibraryMainOuterFrame = nil
--- ===============================================
--- SNOW EFFECT FUNCTION
--- ===============================================
-function Library:CreateSnowEffect(parentFrame)
-    local SnowFolder = Instance.new("Folder")
-    SnowFolder.Name = "SnowContainer"
-    SnowFolder.Parent = parentFrame
-
-    local snowflakeId = "rbxassetid://241876428" -- Simple white dot
-    local TweenService = game:GetService("TweenService")
-
-    task.spawn(function()
-        while parentFrame and parentFrame.Parent do
-            local size = math.random(4, 8)
-            local snowflake = Library:Create("ImageLabel", {
-                BackgroundTransparency = 1;
-                Size = UDim2.new(0, size, 0, size);
-                Image = snowflakeId;
-                ImageColor3 = Color3.fromRGB(255, 255, 255);
-                ImageTransparency = math.random(2, 6) / 10; -- Random transparency
-                ZIndex = 100; -- High ZIndex to stay on top
-                Parent = SnowFolder;
-            })
-
-            local startX = math.random()
-            local endX = startX + (math.random(-15, 15) / 100) -- Slight drift
-            local duration = math.random(30, 60) / 10 -- 3 to 6 seconds to fall
-
-            local tween = TweenService:Create(snowflake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-                Position = UDim2.new(endX, 0, 1.1, 0) -- Fall to bottom
-            })
-            tween:Play()
-            tween.Completed:Connect(function()
-                if snowflake then snowflake:Destroy() end
-            end)
-
-            task.wait(math.random(1, 4) / 10) -- Spawn rate
-        end
-    end)
-end
--- ===============================================
 
 local Toggles = {}
 local Options = {}
@@ -343,6 +302,48 @@ local Library = {
     ImageManager = CustomImageManager;
     ShowCursorBinding = string.sub(tostring({}), 10);
 }
+
+-- ===============================================
+-- SNOW EFFECT FUNCTION
+-- ===============================================
+function Library:CreateSnowEffect(parentFrame)
+    local SnowFolder = Instance.new("Folder")
+    SnowFolder.Name = "SnowContainer"
+    SnowFolder.Parent = parentFrame
+
+    local snowflakeId = "rbxassetid://241876428"
+    local TweenService = game:GetService("TweenService")
+
+    task.spawn(function()
+        while parentFrame and parentFrame.Parent do
+            local size = math.random(4, 8)
+            local snowflake = Library:Create("ImageLabel", {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(0, size, 0, size);
+                Image = snowflakeId;
+                ImageColor3 = Color3.fromRGB(255, 255, 255);
+                ImageTransparency = math.random(2, 6) / 10;
+                ZIndex = 100;
+                Parent = SnowFolder;
+            })
+
+            local startX = math.random()
+            local endX = startX + (math.random(-15, 15) / 100)
+            local duration = math.random(30, 60) / 10
+
+            local tween = TweenService:Create(snowflake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+                Position = UDim2.new(endX, 0, 1.1, 0)
+            })
+            tween:Play()
+            tween.Completed:Connect(function()
+                if snowflake then snowflake:Destroy() end
+            end)
+
+            task.wait(math.random(1, 4) / 10)
+        end
+    end)
+end
+-- ===============================================
 
 if RunService:IsStudio() then
    Library.IsMobile = InputService.TouchEnabled and not InputService.MouseEnabled 
@@ -6700,8 +6701,7 @@ function Library:CreateWindow(...)
         Parent = Inner;
     })
 
-    -- 3. Start the Snow Effect
-    Library:CreateSnowEffect(Inner)
+    -- 3. Start the Snow Effect  CreateSnowEffect(Inner)
     -- ===============================================
 
     Library:AddToRegistry(Inner, {
