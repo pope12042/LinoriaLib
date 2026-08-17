@@ -3507,17 +3507,20 @@ do
                 Parent = Outer;
             })
     -- Center Background Image
+    -- Center Background Image
     Library.CenterImage = Library:Create("ImageLabel", {
+        Name = "CenterImage";
         BackgroundTransparency = 1;
         Position = UDim2.new(0.5, 0, 0.5, 0);
         AnchorPoint = Vector2.new(0.5, 0.5);
-        Size = UDim2.new(0, 200, 0, 200); -- Adjust size here
-        Image = "rbxassetid://124796893161306"; -- Replace with your image ID
-        ImageTransparency = 0.6; -- Adjust transparency (0 = visible, 1 = invisible)
-        ScaleType = Enum.ScaleType.Fit;
-        ZIndex = 0; -- Puts it behind the tabs
-        Parent = Inner;
+        Size = UDim2.new(0, 400, 0, 400); -- Made it bigger
+        Image = "rbxassetid://77464945159113"; -- <--- CHECK THIS ID
+        ImageTransparency = 0.85; -- Very faint (like your screenshot)
+        ScaleType = Enum.ScaleType.Fit; -- Important: Fits the image nicely
+        ZIndex = 0; -- Sits behind everything
+        Parent = Inner; 
     })
+
 
             local Label = Library:CreateLabel({
                 Size = UDim2.new(1, 0, 1, 0);
