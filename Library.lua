@@ -6573,6 +6573,47 @@ function Library:CreateWindow(...)
     Library:MakeDraggable(Outer, 25, true)
     if WindowInfo.Resizable then Library:MakeResizable(Outer, Library.MinSize) end
 
+    -- ===============================================
+    -- CUSTOM: Game Label (Top Right) & Center Image
+    -- ===============================================
+    local GameName = "Unknown Game"
+    pcall(function()
+        local info = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+        if info and info.Name then 
+            GameName = info.Name 
+        end
+    end)
+
+    -- Top Right Game Label
+    Library.GameLabel = Library:Create("TextLabel", {
+        Name = "GameLabel";
+        BackgroundTransparency = 1;
+        Position = UDim2.new(1, -10, 0, 5);
+        Size = UDim2.new(0, 250, 0, 20);
+        AnchorPoint = Vector2.new(1, 0);
+        Font = Enum.Font.GothamSemibold;
+        Text = GameName;
+        TextColor3 = Color3.fromRGB(200, 200, 200);
+        TextSize = 14;
+        TextXAlignment = Enum.TextXAlignment.Right;
+        ZIndex = 3;
+        Parent = Inner; -- Attaches to the inside of the window
+    })
+
+    -- Center Background Image
+    Library.CenterImage = Library:Create("ImageLabel", {
+        Name = "CenterImage";
+        BackgroundTransparency = 1;
+        Position = UDim2.new(0.5, 0, 0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        Size = UDim2.new(0, 150, 0, 150);
+        Image = "rbxassetid://11819605722"; -- Replace with your image ID
+        ImageTransparency = 0.3;
+        ZIndex = 0; -- Sits behind all UI elements
+        Parent = Outer; -- Attaches to the outer window frame
+    })
+    -- ===============================================
+
     local Inner = Library:Create("Frame", {
         BackgroundColor3 = Library.MainColor;
         BorderColor3 = Library.AccentColor;
@@ -8247,3 +8288,31 @@ end))
 getgenv().Linoria = Library
 if getgenv().skip_getgenv_linoria ~= true then getgenv().Library = Library end
 return Library
+-- ===============================================
+-- CUSTOM HELPER FUNCTIONS
+-- ===============================================
+function Library:SetGameLabel(Text)
+    if self.GameLabel then
+        self.GameLabel.Text = tostring(Text)
+    end
+end
+
+function Library:SetCenterImage(ImageId)
+    if self.CenterImage then
+        self.CenterImage.Image = tostring(ImageId)
+    end
+end
+
+function Library:SetCenterImageTransparency(Transparency)
+    if self.CenterImage then
+        self.CenterImage.ImageTransparency = tonumber(Transparency) or 0.3
+    end
+end
+
+function Library:SetCenterImageSize(Size)
+    if self.CenterImage then
+        local size = tonumber(Size) or 150
+        self.CenterImage.Size = UDim2.new(0, size, 0, size)
+    end
+end
+-- ===============================================
