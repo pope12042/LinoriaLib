@@ -20,8 +20,18 @@
 --]]
 
 local repo = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/pope12042/LinoriaLib/main/Library.lua"))()
 
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+-- Game name shows automatically, but you can change it:
+Library:SetGameLabel("My Custom Script")
+
+-- Change the center image:
+Library:SetCenterImage("rbxassetid://YOUR_IMAGE_ID")
+
+-- Adjust appearance:
+Library:SetCenterImageTransparency(0.5)
+Library:SetCenterImageSize(200)
+
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
