@@ -81,6 +81,47 @@ ModalElement.ZIndex = -999
 ModalElement.Parent = ScreenGui
 
 local LibraryMainOuterFrame = nil
+-- ===============================================
+-- SNOW EFFECT FUNCTION
+-- ===============================================
+function Library:CreateSnowEffect(parentFrame)
+    local SnowFolder = Instance.new("Folder")
+    SnowFolder.Name = "SnowContainer"
+    SnowFolder.Parent = parentFrame
+
+    local snowflakeId = "rbxassetid://241876428" -- Simple white dot
+    local TweenService = game:GetService("TweenService")
+
+    task.spawn(function()
+        while parentFrame and parentFrame.Parent do
+            local size = math.random(4, 8)
+            local snowflake = Library:Create("ImageLabel", {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(0, size, 0, size);
+                Image = snowflakeId;
+                ImageColor3 = Color3.fromRGB(255, 255, 255);
+                ImageTransparency = math.random(2, 6) / 10; -- Random transparency
+                ZIndex = 100; -- High ZIndex to stay on top
+                Parent = SnowFolder;
+            })
+
+            local startX = math.random()
+            local endX = startX + (math.random(-15, 15) / 100) -- Slight drift
+            local duration = math.random(30, 60) / 10 -- 3 to 6 seconds to fall
+
+            local tween = TweenService:Create(snowflake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+                Position = UDim2.new(endX, 0, 1.1, 0) -- Fall to bottom
+            })
+            tween:Play()
+            tween.Completed:Connect(function()
+                if snowflake then snowflake:Destroy() end
+            end)
+
+            task.wait(math.random(1, 4) / 10) -- Spawn rate
+        end
+    end)
+end
+-- ===============================================
 
 local Toggles = {}
 local Options = {}
@@ -246,7 +287,7 @@ local Library = {
     RiskColor = Color3.fromRGB(255, 50, 50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Code,
+    Font = Enum.Font.RobotoMono,
 
     -- frames --
     OpenedFrames = {};
@@ -6638,6 +6679,30 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Outer;
     })
+    -- ===============================================
+    -- BACKGROUND IMAGE & SNOW
+    -- ===============================================
+    
+    -- 1. Make the background slightly transparent so we can see the image/snow
+    Inner.BackgroundTransparency = 0.15; 
+
+    -- 2. Add the Center Image (Watermark)
+    Library.CenterImage = Library:Create("ImageLabel", {
+        Name = "CenterImage";
+        BackgroundTransparency = 1;
+        Position = UDim2.new(0.5, 0, 0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        Size = UDim2.new(0, 350, 0, 350); -- Large size
+        Image = "rbxassetid://77464945159113"; -- <--- REPLACE WITH YOUR IMAGE ID
+        ImageTransparency = 0.85; -- Very faint
+        ScaleType = Enum.ScaleType.Fit;
+        ZIndex = 1; -- Behind tabs
+        Parent = Inner;
+    })
+
+    -- 3. Start the Snow Effect
+    Library:CreateSnowEffect(Inner)
+    -- ===============================================
 
     Library:AddToRegistry(Inner, {
         BackgroundColor3 = "MainColor";
