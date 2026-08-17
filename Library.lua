@@ -8283,12 +8283,7 @@ Library:GiveSignal(RunService.RenderStepped:Connect(function(Delta)
         Library.CurrentRainbowColor = Color3.fromHSV(Hue, 0.8, 1)
     end
 end))
-
-----
-getgenv().Linoria = Library
-if getgenv().skip_getgenv_linoria ~= true then getgenv().Library = Library end
-return Library
--- ===============================================
+===============================================
 -- CUSTOM HELPER FUNCTIONS
 -- ===============================================
 function Library:SetGameLabel(Text)
@@ -8316,3 +8311,7 @@ function Library:SetCenterImageSize(Size)
     end
 end
 -- ===============================================
+
+getgenv().Linoria = Library
+if getgenv().skip_getgenv_linoria ~= true then getgenv().Library = Library end
+return Library
