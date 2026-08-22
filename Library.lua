@@ -6718,8 +6718,6 @@ function Library:CreateWindow(...)
         Parent = Inner; -- Attaches to the inside of the window
     })
 
-===============================================
-
     local Inner = Library:Create("Frame", {
         BackgroundColor3 = Library.MainColor;
         BorderColor3 = Library.AccentColor;
