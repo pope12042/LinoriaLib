@@ -343,9 +343,8 @@ function Library:CreateSnowEffect(parentFrame)
         end
     end)
 end
--- ===============================================
-    -- Start the Snow Effect
-    Library:CreateSnowEffect(MainOuter)
+
+Library:CreateSnowEffect(MainOuter)
 
 
 if RunService:IsStudio() then
