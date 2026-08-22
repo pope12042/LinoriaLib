@@ -3548,6 +3548,66 @@ do
                 ZIndex = 6;
                 Parent = Outer;
             })
+    -- ===============================================
+    -- FIXED: Background Image & Snow Effect
+    -- ===============================================
+    
+    -- 1. Make the background slightly transparent so we can see the image
+    Inner.BackgroundTransparency = 0.2; 
+
+    -- 2. Add the Center Image (Watermark)
+    -- We use ZIndex 1 so it sits BEHIND the tabs (which are ZIndex 2+)
+    Library.CenterImage = Library:Create("ImageLabel", {
+        Name = "CenterImage";
+        BackgroundTransparency = 1;
+        Position = UDim2.new(0.5, 0, 0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        Size = UDim2.new(0, 350, 0, 350); 
+        Image = "rbxassetid://7072706665"; -- <--- WORKING ID (Star/Sparkle)
+        ImageTransparency = 0.85; -- Very faint
+        ScaleType = Enum.ScaleType.Fit;
+        ZIndex = 1; 
+        Parent = Inner;
+    })
+
+    -- 3. Start the Snow Effect
+    -- We parent snow to 'Outer' so it doesn't get cut off if Inner clips descendants
+    local SnowFolder = Instance.new("Folder")
+    SnowFolder.Name = "SnowContainer"
+    SnowFolder.Parent = Outer
+
+    local TweenService = game:GetService("TweenService")
+
+    task.spawn(function()
+        while Outer and Outer.Parent do
+            -- Use a reliable white circle for snowflakes
+            local size = math.random(4, 8)
+            local snowflake = Library:Create("ImageLabel", {
+                BackgroundTransparency = 1;
+                Size = UDim2.new(0, size, 0, size);
+                Image = "rbxassetid://3573811283"; -- <--- WORKING ID (White Circle)
+                ImageColor3 = Color3.fromRGB(255, 255, 255);
+                ImageTransparency = math.random(2, 6) / 10;
+                ZIndex = 100; -- High ZIndex so snow falls OVER the groupboxes
+                Parent = SnowFolder;
+            })
+
+            local startX = math.random() * Outer.AbsoluteSize.X
+            local duration = math.random(30, 60) / 10 -- 3 to 6 seconds to fall
+
+            local tween = TweenService:Create(snowflake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+                Position = UDim2.new(0, startX, 1, 0) -- Fall to the bottom
+            })
+            tween:Play()
+            tween.Completed:Connect(function()
+                if snowflake then snowflake:Destroy() end
+            end)
+
+            task.wait(math.random(1, 3) / 10) -- Spawn rate
+        end
+    end)
+    -- ===============================================
+
     -- Center Background Image
     -- Center Background Image
     Library.CenterImage = Library:Create("ImageLabel", {
