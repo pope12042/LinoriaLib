@@ -344,6 +344,9 @@ function Library:CreateSnowEffect(parentFrame)
     end)
 end
 -- ===============================================
+    -- Start the Snow Effect
+    Library:CreateSnowEffect(MainOuter)
+
 
 if RunService:IsStudio() then
    Library.IsMobile = InputService.TouchEnabled and not InputService.MouseEnabled 
@@ -3609,7 +3612,6 @@ do
     -- ===============================================
 
     -- Center Background Image
-    -- Center Background Image
     Library.CenterImage = Library:Create("ImageLabel", {
         Name = "CenterImage";
         BackgroundTransparency = 1;
@@ -6717,19 +6719,7 @@ function Library:CreateWindow(...)
         Parent = Inner; -- Attaches to the inside of the window
     })
 
-    -- Center Background Image
-    Library.CenterImage = Library:Create("ImageLabel", {
-        Name = "CenterImage";
-        BackgroundTransparency = 1;
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Size = UDim2.new(0, 150, 0, 150);
-        Image = "rbxassetid://11819605722"; -- Replace with your image ID
-        ImageTransparency = 0.3;
-        ZIndex = 0; -- Sits behind all UI elements
-        Parent = Outer; -- Attaches to the outer window frame
-    })
-    -- ===============================================
+===============================================
 
     local Inner = Library:Create("Frame", {
         BackgroundColor3 = Library.MainColor;
@@ -8088,17 +8078,33 @@ end
     local Fading = false
     
     function Window:Toggle(Toggling)
-        if typeof(Toggling) == "boolean" and Toggling == Toggled then return end
-        if Fading then return end
+    if typeof(Toggling) == "boolean" and Toggling == Toggled then return end
+    
+    Toggled = (not Toggled)
+    Library.Toggled = Toggled
+    
+    if WindowInfo.UnlockMouseWhileOpen then
+        ModalElement.Modal = Library.Toggled
+    end
 
-        local FadeTime = WindowInfo.MenuFadeTime
-        Fading = true
-        Toggled = (not Toggled)
+    -- Close all dropdowns, color pickers, etc.
+    for _, Option in Options do
+        task.spawn(function()
+            if Option.Type == "Dropdown" then
+                Option:CloseDropdown()
+            elseif Option.Type == "KeyPicker" then
+                Option:SetModePickerVisibility(false)
+            elseif Option.Type == "ColorPicker" then
+                Option.ContextMenu:Hide()
+                Option:Hide()
+            end
+        end)
+    end
 
-        Library.Toggled = Toggled
-        if WindowInfo.UnlockMouseWhileOpen then
-            ModalElement.Modal = Library.Toggled
-        end
+    -- INSTANT visibility toggle - no fade, no blur
+    Outer.Visible = Toggled
+end
+
 
         if Toggled then
             -- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
