@@ -6596,6 +6596,48 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     })
+--// Title (top middle) --
+local WindowLabel = Library:CreateLabel({
+    Position = UDim2.new(0, 7, 0, 0);
+    Size = UDim2.new(1, -14, 0, 25);            -- full width so Center alignment works
+    Text = WindowInfo.Title or "";
+    TextXAlignment = Enum.TextXAlignment.Center;
+    ZIndex = 1;
+    Parent = Inner;
+})
+
+--// Logo image (top left) --
+local WindowLogo = Library:Create("ImageLabel", {
+    BackgroundTransparency = 1;
+    Position = UDim2.new(0, 7, 0, 5);           -- vertically centered in the 25px bar
+    Size = UDim2.new(0, 15, 0, 15);
+    Image = WindowInfo.Logo or "";
+    ScaleType = Enum.ScaleType.Fit;
+    ZIndex = 2;
+    Parent = Inner;
+})
+
+function Window:SetLogo(AssetId: string)
+    WindowLogo.Image = AssetId
+end
+--// Watermark image (inside the window, behind everything) --
+local WindowImage = Library:Create("ImageLabel", {
+    BackgroundTransparency = 1;
+    Position = UDim2.new(0, 10, 0, 30);
+    Size = UDim2.new(1, -20, 1, -40);
+    Image = WindowInfo.Watermark or "";
+    ImageTransparency = WindowInfo.WatermarkTransparency or 0.75;
+    ScaleType = Enum.ScaleType.Fit;
+    ZIndex = 0;
+    Parent = Inner;
+})
+
+function Window:SetWatermark(AssetId: string, Transparency: number?)
+    WindowImage.Image = AssetId
+    WindowImage.ImageTransparency = Transparency or 0.75
+end
+
+
 --// Game name label (top right, like "Rivals") --
 local Success, ProductInfo = pcall(function()
     return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
