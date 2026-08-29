@@ -6596,9 +6596,7 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     })
---// HEADER: logo left | title center | game name right | watermark inside --
-local TextService = game:GetService("TextService")
-
+--// HEADER: logo left | title default (left) | game name right | watermark inside --
 local WindowLogo = Library:Create("ImageLabel", {
     BackgroundTransparency = 1;
     Position = UDim2.new(0, 7, 0, 5);
@@ -6609,11 +6607,12 @@ local WindowLogo = Library:Create("ImageLabel", {
     Parent = Inner;
 })
 
+-- title back to DEFAULT (left aligned)
 local WindowLabel = Library:CreateLabel({
-    Position = UDim2.new(0, 7, 0, 0);
-    Size = UDim2.new(1, -14, 0, 25);
+    Position = UDim2.new(0, 26, 0, 0);   -- 26 so it starts after the logo (use 7 if you removed the logo)
+    Size = UDim2.new(0, 0, 0, 25);
     Text = WindowInfo.Title or "";
-    TextXAlignment = Enum.TextXAlignment.Center;
+    TextXAlignment = Enum.TextXAlignment.Left;
     ZIndex = 1;
     Parent = Inner;
 })
@@ -6639,12 +6638,32 @@ local GameNameLabel = Library:Create("TextLabel", {
 Library:ApplyTextStroke(GameNameLabel)
 Library:AddToRegistry(GameNameLabel, { TextColor3 = "AccentColor" })
 
--- shrink the centered title so it never touches the game name
-local function UpdateTitleWidth()
-    local nameWidth = TextService:GetTextSize(GameNameLabel.Text, GameNameLabel.TextSize, GameNameLabel.Font, Vector2.new(10000, 10000)).X
-    WindowLabel.Size = UDim2.new(1, -(nameWidth + 25), 0, 25)
+local WindowImage = Library:Create("ImageLabel", {
+    BackgroundTransparency = 1;
+    Position = UDim2.new(0, 10, 0, 30);
+    Size = UDim2.new(1, -20, 1, -40);
+    Image = WindowInfo.Watermark or "";
+    ImageTransparency = WindowInfo.WatermarkTransparency or 0.75;
+    ScaleType = Enum.ScaleType.Fit;
+    ZIndex = 1;
+    Parent = Inner;
+})
+
+Window.GameNameLabel = GameNameLabel
+
+function Window:SetGameName(Text)
+    GameNameLabel.Text = Text
 end
-UpdateTitleWidth()
+
+function Window:SetLogo(AssetId)
+    WindowLogo.Image = AssetId
+end
+
+function Window:SetWatermark(AssetId, Transparency)
+    WindowImage.Image = AssetId
+    WindowImage.ImageTransparency = Transparency or 0.75
+end
+
 
 -- watermark: ZIndex 1 so it sits ABOVE the window background, BELOW the content
 local WindowImage = Library:Create("ImageLabel", {
