@@ -6596,17 +6596,9 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     })
---// Title (top middle) --
-local WindowLabel = Library:CreateLabel({
-    Position = UDim2.new(0, 7, 0, 0);
-    Size = UDim2.new(1, -14, 0, 25);
-    Text = WindowInfo.Title or "";
-    TextXAlignment = Enum.TextXAlignment.Center;
-    ZIndex = 1;
-    Parent = Inner;
-})
+--// HEADER: logo left | title center | game name right | watermark inside --
+local TextService = game:GetService("TextService")
 
---// Logo (top left) --
 local WindowLogo = Library:Create("ImageLabel", {
     BackgroundTransparency = 1;
     Position = UDim2.new(0, 7, 0, 5);
@@ -6617,19 +6609,15 @@ local WindowLogo = Library:Create("ImageLabel", {
     Parent = Inner;
 })
 
---// Watermark (inside window, behind everything) --
-local WindowImage = Library:Create("ImageLabel", {
-    BackgroundTransparency = 1;
-    Position = UDim2.new(0, 10, 0, 30);
-    Size = UDim2.new(1, -20, 1, -40);
-    Image = WindowInfo.Watermark or "";
-    ImageTransparency = WindowInfo.WatermarkTransparency or 0.75;
-    ScaleType = Enum.ScaleType.Fit;
-    ZIndex = 0;
+local WindowLabel = Library:CreateLabel({
+    Position = UDim2.new(0, 7, 0, 0);
+    Size = UDim2.new(1, -14, 0, 25);
+    Text = WindowInfo.Title or "";
+    TextXAlignment = Enum.TextXAlignment.Center;
+    ZIndex = 1;
     Parent = Inner;
 })
 
---// Game name (top right; blank if "", auto if omitted) --
 local Success, ProductInfo = pcall(function()
     return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
 end)
@@ -6644,20 +6632,37 @@ local GameNameLabel = Library:Create("TextLabel", {
     Size = UDim2.new(0, 0, 0, 25);
     Text = WindowInfo.GameName or (Success and ProductInfo.Name or "Roblox");
     TextXAlignment = Enum.TextXAlignment.Right;
-    ZIndex = 1;
+    ZIndex = 2;
     Parent = Inner;
 })
 
 Library:ApplyTextStroke(GameNameLabel)
+Library:AddToRegistry(GameNameLabel, { TextColor3 = "AccentColor" })
 
-Library:AddToRegistry(GameNameLabel, {
-    TextColor3 = "AccentColor";
+-- shrink the centered title so it never touches the game name
+local function UpdateTitleWidth()
+    local nameWidth = TextService:GetTextSize(GameNameLabel.Text, GameNameLabel.TextSize, GameNameLabel.Font, Vector2.new(10000, 10000)).X
+    WindowLabel.Size = UDim2.new(1, -(nameWidth + 25), 0, 25)
+end
+UpdateTitleWidth()
+
+-- watermark: ZIndex 1 so it sits ABOVE the window background, BELOW the content
+local WindowImage = Library:Create("ImageLabel", {
+    BackgroundTransparency = 1;
+    Position = UDim2.new(0, 10, 0, 30);
+    Size = UDim2.new(1, -20, 1, -40);
+    Image = WindowInfo.Watermark or "";
+    ImageTransparency = WindowInfo.WatermarkTransparency or 0.75;
+    ScaleType = Enum.ScaleType.Fit;
+    ZIndex = 1;
+    Parent = Inner;
 })
 
 Window.GameNameLabel = GameNameLabel
 
 function Window:SetGameName(Text)
     GameNameLabel.Text = Text
+    UpdateTitleWidth()
 end
 
 function Window:SetLogo(AssetId)
@@ -6669,8 +6674,6 @@ function Window:SetWatermark(AssetId, Transparency)
     WindowImage.ImageTransparency = Transparency or 0.75
 end
 
-
-Library:ApplyTextStroke(GameNameLabel)
 
 -- make it follow the accent color when the theme changes
 Library:AddToRegistry(GameNameLabel, {
