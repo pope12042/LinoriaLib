@@ -40,8 +40,7 @@ local Window = Library:CreateWindow({
 	-- Set UnlockMouseWhileOpen to false if you don't want to unlock the mouse when the UI is toggled
 	-- NotifySide = Changes the side of the notifications (Left, Right) (Default value = Left)
 	-- Position and Size are also valid options here
-	-- but you do not need to define them unless you are changing them :)
-	
+	-- but you do not need to define them unless you are changing 
    Title = "Project Aurora | dsc.gg/getaroura",  -- top middle
 -- top right (or auto-detected)
     Logo = "rbxassetid://80633121513034",                          -- top left image
