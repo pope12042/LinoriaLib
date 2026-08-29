@@ -41,8 +41,8 @@ local Window = Library:CreateWindow({
 	-- NotifySide = Changes the side of the notifications (Left, Right) (Default value = Left)
 	-- Position and Size are also valid options here
 	-- but you do not need to define them unless you are changing them :)
-local Window = Library:CreateWindow({
-    Title = "Project Aurora | dsc.gg/getaroura",  -- top middle
+	
+   Title = "Project Aurora | dsc.gg/getaroura",  -- top middle
 -- top right (or auto-detected)
     Logo = "rbxassetid://80633121513034",                          -- top left image
     Watermark = "rbxassetid://124796893161306",                     -- faint image inside
