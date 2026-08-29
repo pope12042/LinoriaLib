@@ -74,14 +74,6 @@ Library:Notify({
 -- Window:SetLogo("rbxassetid://...")
 -- Window:SetWatermark("rbxassetid://...", 0.85)
 
-	Resizable = true,
-	ShowCustomCursor = true,
-	UnlockMouseWhileOpen = true,
-	NotifySide = "Left",
-	TabPadding = 8,
-	MenuFadeTime = 0.2
-})
-
 -- CALLBACK NOTE:
 -- Passing in callback functions via the initial element parameters (i.e. Callback = function(Value)...) works
 -- HOWEVER, using Toggles/Options.INDEX:OnChanged(function(Value) ... ) is the RECOMMENDED way to do this.
