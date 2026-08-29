@@ -33,21 +33,42 @@ Library.ShowCustomCursor = true -- Toggles the Linoria cursor globaly (Default v
 Library.NotifySide = "Left" -- Changes the side of the notifications globaly (Left, Right) (Default value = Left)
 
 local Window = Library:CreateWindow({
-	-- Set Center to true if you want the menu to appear in the center
-	-- Set AutoShow to true if you want the menu to appear when it is created
-	-- Set Resizable to true if you want to have in-game resizable Window
-	-- Set ShowCustomCursor to false if you don't want to use the Linoria cursor
-	-- Set UnlockMouseWhileOpen to false if you don't want to unlock the mouse when the UI is toggled
-	-- NotifySide = Changes the side of the notifications (Left, Right) (Default value = Left)
-	-- Position and Size are also valid options here
-	-- but you do not need to define them unless you are changing 
-   Title = "Project Aurora | dsc.gg/getaroura",  -- top middle
--- top right (or auto-detected)
-    Logo = "rbxassetid://80633121513034",                          -- top left image
-    Watermark = "rbxassetid://124796893161306",                     -- faint image inside
-    WatermarkTransparency = 0.8,
+    Title = "Project Aurora | dsc.gg/getaroura",
+    Logo = "rbxassetid://
+		80633121513034",
+    Watermark = "rbxassetid://124796893161306",
+    WatermarkTransparency = 0.5,
     Center = true,
     AutoShow = true,
+    TabPadding = 8,
+    MenuFadeTime = 0.2,
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    Main = Window:AddTab("Main"),
+    Settings = Window:AddTab("Settings"),
+}
+
+local MainBox = Tabs.Main:AddLeftGroupbox("Main")
+
+MainBox:AddToggle("MyToggle", {
+    Text = "Enable something",
+    Default = false,
+})
+
+MainBox:AddSlider("MySlider", {
+    Text = "Some slider",
+    Default = 10,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+})
+
+Library:Notify({
+    Title = "Loaded",
+    Description = "UI loaded successfully.",
+    Duration = 5,
 })
 
 -- change at runtime if you want:
