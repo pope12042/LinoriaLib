@@ -6599,17 +6599,17 @@ function Library:CreateWindow(...)
 --// Title (top middle) --
 local WindowLabel = Library:CreateLabel({
     Position = UDim2.new(0, 7, 0, 0);
-    Size = UDim2.new(1, -14, 0, 25);            -- full width so Center alignment works
+    Size = UDim2.new(1, -14, 0, 25);
     Text = WindowInfo.Title or "";
     TextXAlignment = Enum.TextXAlignment.Center;
     ZIndex = 1;
     Parent = Inner;
 })
 
---// Logo image (top left) --
+--// Logo (top left) --
 local WindowLogo = Library:Create("ImageLabel", {
     BackgroundTransparency = 1;
-    Position = UDim2.new(0, 7, 0, 5);           -- vertically centered in the 25px bar
+    Position = UDim2.new(0, 7, 0, 5);
     Size = UDim2.new(0, 15, 0, 15);
     Image = WindowInfo.Logo or "";
     ScaleType = Enum.ScaleType.Fit;
@@ -6617,10 +6617,7 @@ local WindowLogo = Library:Create("ImageLabel", {
     Parent = Inner;
 })
 
-function Window:SetLogo(AssetId: string)
-    WindowLogo.Image = AssetId
-end
---// Watermark image (inside the window, behind everything) --
+--// Watermark (inside window, behind everything) --
 local WindowImage = Library:Create("ImageLabel", {
     BackgroundTransparency = 1;
     Position = UDim2.new(0, 10, 0, 30);
@@ -6632,13 +6629,7 @@ local WindowImage = Library:Create("ImageLabel", {
     Parent = Inner;
 })
 
-function Window:SetWatermark(AssetId: string, Transparency: number?)
-    WindowImage.Image = AssetId
-    WindowImage.ImageTransparency = Transparency or 0.75
-end
-
-
---// Game name label (top right, like "Rivals") --
+--// Game name (top right; blank if "", auto if omitted) --
 local Success, ProductInfo = pcall(function()
     return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
 end)
@@ -6649,13 +6640,35 @@ local GameNameLabel = Library:Create("TextLabel", {
     TextSize = 16;
     TextColor3 = Library.AccentColor;
     TextStrokeTransparency = 0;
-    Position = UDim2.new(1, -7, 0, 0);          -- 7px from the right edge
-    Size = UDim2.new(0, 0, 0, 25);              -- same height as the title bar
+    Position = UDim2.new(1, -7, 0, 0);
+    Size = UDim2.new(0, 0, 0, 25);
     Text = WindowInfo.GameName or (Success and ProductInfo.Name or "Roblox");
-    TextXAlignment = Enum.TextXAlignment.Right; -- text overflows to the LEFT since width is 0
+    TextXAlignment = Enum.TextXAlignment.Right;
     ZIndex = 1;
     Parent = Inner;
 })
+
+Library:ApplyTextStroke(GameNameLabel)
+
+Library:AddToRegistry(GameNameLabel, {
+    TextColor3 = "AccentColor";
+})
+
+Window.GameNameLabel = GameNameLabel
+
+function Window:SetGameName(Text)
+    GameNameLabel.Text = Text
+end
+
+function Window:SetLogo(AssetId)
+    WindowLogo.Image = AssetId
+end
+
+function Window:SetWatermark(AssetId, Transparency)
+    WindowImage.Image = AssetId
+    WindowImage.ImageTransparency = Transparency or 0.75
+end
+
 
 Library:ApplyTextStroke(GameNameLabel)
 
