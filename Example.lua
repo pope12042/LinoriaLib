@@ -34,8 +34,7 @@ Library.NotifySide = "Left" -- Changes the side of the notifications globaly (Le
 
 local Window = Library:CreateWindow({
     Title = "Project Aurora | dsc.gg/getaroura",
-    Logo = "rbxassetid://
-		80633121513034",
+    Logo = "rbxassetid://80633121513034",
     Watermark = "rbxassetid://124796893161306",
     WatermarkTransparency = 0.5,
     Center = true,
