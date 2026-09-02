@@ -1,24 +1,3 @@
---[[
-                                              _                                 
-                    __      ____ _ _ __ _ __ (_)_ __   __ _                     
-                    \ \ /\ / / _` | '__| '_ \| | '_ \ / _` |                    
-                     \ V  V / (_| | |  | | | | | | | | (_| |                    
-                      \_/\_/ \__,_|_|  |_| |_|_|_| |_|\__, |                    
-                                                      |___/                     
-      this example file is missing a lot of stuff and its pretty outdated       
-               i recommend using the documentation for Obsidian:                
-                        https://docs.mspaint.cc/obsidian                        
-                                                                                
-              a lot of stuff is very similar but it's not the same              
-                you can look through the source code of Linoria                 
-                                                                                
-                if anyone wants to expand on this example script                
-                       make an pull request or something                        
-                                                                                
-                       Original example (mady by wally):                        
-      https://github.com/violin-suzutsuki/LinoriaLib/blob/main/Example.lua                
---]]
-
 local repo = "https://raw.githubusercontent.com/pope12042/LinoriaLib/main/"
 
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
@@ -33,46 +12,25 @@ Library.ShowCustomCursor = true -- Toggles the Linoria cursor globaly (Default v
 Library.NotifySide = "Left" -- Changes the side of the notifications globaly (Left, Right) (Default value = Left)
 
 local Window = Library:CreateWindow({
-    Title = "Project Aurora | dsc.gg/getaroura",
-    Logo = "rbxassetid://80633121513034",
-    Watermark = "rbxassetid://124796893161306",
-    WatermarkTransparency = 0.5,
-    Center = true,
-    AutoShow = true,
-    TabPadding = 8,
-    MenuFadeTime = 0.2,
-    ShowCustomCursor = true,
+	-- Set Center to true if you want the menu to appear in the center
+	-- Set AutoShow to true if you want the menu to appear when it is created
+	-- Set Resizable to true if you want to have in-game resizable Window
+	-- Set ShowCustomCursor to false if you don't want to use the Linoria cursor
+	-- Set UnlockMouseWhileOpen to false if you don't want to unlock the mouse when the UI is toggled
+	-- NotifySide = Changes the side of the notifications (Left, Right) (Default value = Left)
+	-- Position and Size are also valid options here
+	-- but you do not need to define them unless you are changing them :)
+
+	Title = "Example menu",
+	Center = true,
+	AutoShow = true,
+	Resizable = true,
+	ShowCustomCursor = true,
+	UnlockMouseWhileOpen = true,
+	NotifySide = "Left",
+	TabPadding = 8,
+	MenuFadeTime = 0.2
 })
-
-local Tabs = {
-    Main = Window:AddTab("Main"),
-    Settings = Window:AddTab("Settings"),
-}
-
-local MainBox = Tabs.Main:AddLeftGroupbox("Main")
-
-MainBox:AddToggle("MyToggle", {
-    Text = "Enable something",
-    Default = false,
-})
-
-MainBox:AddSlider("MySlider", {
-    Text = "Some slider",
-    Default = 10,
-    Min = 0,
-    Max = 100,
-    Rounding = 0,
-})
-
-Library:Notify({
-    Title = "Loaded",
-    Description = "UI loaded successfully.",
-    Duration = 5,
-})
-
--- change at runtime if you want:
--- Window:SetLogo("rbxassetid://...")
--- Window:SetWatermark("rbxassetid://...", 0.85)
 
 -- CALLBACK NOTE:
 -- Passing in callback functions via the initial element parameters (i.e. Callback = function(Value)...) works
