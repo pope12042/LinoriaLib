@@ -6596,6 +6596,33 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     })
+--// Game name (top right, auto-detected if omitted) --
+local Success, ProductInfo = pcall(function()
+    return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+end)
+
+local GameNameLabel = Library:Create("TextLabel", {
+    BackgroundTransparency = 1;
+    Font = Library.Font;
+    TextSize = 16;
+    TextColor3 = Library.AccentColor;
+    TextStrokeTransparency = 0;
+    Position = UDim2.new(1, -7, 0, 0);
+    Size = UDim2.new(0, 0, 0, 25);
+    Text = WindowInfo.GameName or (Success and ProductInfo.Name or "Roblox");
+    TextXAlignment = Enum.TextXAlignment.Right;
+    ZIndex = 2;
+    Parent = Inner;
+})
+
+Library:ApplyTextStroke(GameNameLabel)
+Library:AddToRegistry(GameNameLabel, { TextColor3 = "AccentColor" })
+
+-- expose for runtime use
+Window.GameNameLabel = GameNameLabel
+function Window:SetGameName(Text)
+    GameNameLabel.Text = Text
+end
 
     local MainSectionOuter = Library:Create("Frame", {
         BackgroundColor3 = Library.BackgroundColor;
