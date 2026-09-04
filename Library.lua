@@ -6596,6 +6596,70 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     })
+--// Resize grip: quarter-circle at bottom-right --
+local GripSize = 16
+local Grip = Library:Create("ImageLabel", {
+    BackgroundTransparency = 1;
+    Position = UDim2.new(1, -GripSize, 1, -GripSize);
+    Size = UDim2.new(0, GripSize, 0, GripSize);
+    Image = "rbxassetid://124796893161306", -- placeholder; we’ll draw the quarter-circle via Canvas
+    ScaleType = Enum.ScaleType.Slice;
+    SliceCenter = Rect.new(0, 0, 0, 0); -- disables slicing so we can use Canvas
+    ZIndex = 3;
+    Parent = Inner;
+})
+
+-- Draw a quarter-circle (top-left quadrant) using Canvas
+local Canvas = Instance.new("Canvas", Grip)
+Canvas.Size = UDim2.new(1, 0, 1, 0)
+Canvas.Position = UDim2.new(0, 0, 0, 0)
+
+local Circle = Instance.new("CanvasCircle", Canvas)
+Circle.Radius = GripSize / 2
+Circle.Center = Vector2.new(GripSize / 2, GripSize / 2)
+Circle.FillColor = Library.AccentColor
+Circle.FillTransparency = 0
+Circle.BorderSize = 0
+
+-- Optional: add subtle border for contrast
+local Border = Instance.new("CanvasRectangle", Canvas)
+Border.CornerRadius = Vector2.new(1, 1)
+Border.Size = UDim2.new(1, 0, 1, 0)
+Border.Position = UDim2.new(0, 0, 0, 0)
+Border.BorderColor = Color3.fromRGB(50, 50, 50)
+Border.BorderTransparency = 0.5
+Border.BorderSize = 1
+
+-- Make it draggable for resizing
+local function OnDragStart(input, gameProcessed)
+    if gameProcessed then return end
+    local StartPos = input.Position
+    local StartSize = Outer.Size
+
+    local function OnDrag(input)
+        local Delta = input.Position - StartPos
+        local NewWidth = math.max(Library.MinSize.X, StartSize.X.Offset + Delta.X)
+        local NewHeight = math.max(Library.MinSize.Y, StartSize.Y.Offset + Delta.Y)
+        Outer.Size = UDim2.new(0, NewWidth, 0, NewHeight)
+    end
+
+    local function OnDragEnd()
+        Grip.InputEnded:Disconnect()
+        Grip.InputChanged:Disconnect()
+    end
+
+    Grip.InputBegan:Connect(function(i, gp)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            if not gp then
+                Grip.InputChanged:Connect(OnDrag)
+                Grip.InputEnded:Connect(OnDragEnd)
+            end
+        end
+    end)
+end
+
+Grip.InputBegan:Connect(OnDragStart)
+
 --// Game name (top right, auto-detected if omitted) --
 local Success, ProductInfo = pcall(function()
     return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
