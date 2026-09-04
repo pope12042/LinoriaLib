@@ -6596,69 +6596,73 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     })
---// Resize grip: quarter-circle at bottom-right --
-local GripSize = 16
-local Grip = Library:Create("ImageLabel", {
+--// Resize grip: quarter-circle at bottom-right (executor safe) --
+local GripSize = 18
+local GripContainer = Library:Create("Frame", {
     BackgroundTransparency = 1;
     Position = UDim2.new(1, -GripSize, 1, -GripSize);
     Size = UDim2.new(0, GripSize, 0, GripSize);
-    Image = "rbxassetid://124796893161306", -- placeholder; we’ll draw the quarter-circle via Canvas
-    ScaleType = Enum.ScaleType.Slice;
-    SliceCenter = Rect.new(0, 0, 0, 0); -- disables slicing so we can use Canvas
     ZIndex = 3;
     Parent = Inner;
 })
 
--- Draw a quarter-circle (top-left quadrant) using Canvas
-local Canvas = Instance.new("Canvas", Grip)
-Canvas.Size = UDim2.new(1, 0, 1, 0)
-Canvas.Position = UDim2.new(0, 0, 0, 0)
+-- Create the quarter-circle using a masked circle
+local Circle = Library:Create("Frame", {
+    BackgroundColor3 = Library.AccentColor;
+    BorderSizePixel = 0;
+    Position = UDim2.new(0, -GripSize/2, 0, -GripSize/2); -- offset so only top-left quadrant shows
+    Size = UDim2.new(0, GripSize, 0, GripSize);
+    ZIndex = 3;
+    Parent = GripContainer;
+})
+Library:AddToRegistry(Circle, { BackgroundColor3 = "AccentColor" })
 
-local Circle = Instance.new("CanvasCircle", Canvas)
-Circle.Radius = GripSize / 2
-Circle.Center = Vector2.new(GripSize / 2, GripSize / 2)
-Circle.FillColor = Library.AccentColor
-Circle.FillTransparency = 0
-Circle.BorderSize = 0
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(1, 0) -- makes it a perfect circle
+Corner.Parent = Circle
 
--- Optional: add subtle border for contrast
-local Border = Instance.new("CanvasRectangle", Canvas)
-Border.CornerRadius = Vector2.new(1, 1)
-Border.Size = UDim2.new(1, 0, 1, 0)
-Border.Position = UDim2.new(0, 0, 0, 0)
-Border.BorderColor = Color3.fromRGB(50, 50, 50)
-Border.BorderTransparency = 0.5
-Border.BorderSize = 1
+-- Mask to show ONLY the top-left quadrant (the part visible in bottom-right corner)
+local Mask = Library:Create("Frame", {
+    BackgroundTransparency = 1;
+    ClipsDescendants = true;
+    Position = UDim2.new(0, 0, 0, 0);
+    Size = UDim2.new(1, 0, 1, 0);
+    ZIndex = 4;
+    Parent = GripContainer;
+})
+-- Re-parent circle into mask so clipping works
+Circle.Parent = Mask
 
--- Make it draggable for resizing
+-- Drag-to-resize logic (same as before, but now on GripContainer)
 local function OnDragStart(input, gameProcessed)
     if gameProcessed then return end
     local StartPos = input.Position
     local StartSize = Outer.Size
 
-    local function OnDrag(input)
-        local Delta = input.Position - StartPos
-        local NewWidth = math.max(Library.MinSize.X, StartSize.X.Offset + Delta.X)
-        local NewHeight = math.max(Library.MinSize.Y, StartSize.Y.Offset + Delta.Y)
-        Outer.Size = UDim2.new(0, NewWidth, 0, NewHeight)
-    end
+    local Connection
+    Connection = game:GetService("UserInputService").InputChanged:Connect(function(inp)
+        if inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch then
+            local Delta = inp.Position - StartPos
+            local NewW = math.max(Library.MinSize.X, StartSize.X.Offset + Delta.X)
+            local NewH = math.max(Library.MinSize.Y, StartSize.Y.Offset + Delta.Y)
+            Outer.Size = UDim2.new(0, NewW, 0, NewH)
+        end
+    end)
 
-    local function OnDragEnd()
-        Grip.InputEnded:Disconnect()
-        Grip.InputChanged:Disconnect()
-    end
-
-    Grip.InputBegan:Connect(function(i, gp)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
-            if not gp then
-                Grip.InputChanged:Connect(OnDrag)
-                Grip.InputEnded:Connect(OnDragEnd)
-            end
+    local EndConn
+    EndConn = game:GetService("UserInputService").InputEnded:Connect(function(inp)
+        if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+            Connection:Disconnect()
+            EndConn:Disconnect()
         end
     end)
 end
 
-Grip.InputBegan:Connect(OnDragStart)
+GripContainer.InputBegan:Connect(function(inp, gp)
+    if not gp and (inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch) then
+        OnDragStart(inp, gp)
+    end
+end)
 
 --// Game name (top right, auto-detected if omitted) --
 local Success, ProductInfo = pcall(function()
