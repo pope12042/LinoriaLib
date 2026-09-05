@@ -6592,12 +6592,18 @@ local WindowImage = Library:Create("ImageLabel", {
     BackgroundTransparency = 1;
     AnchorPoint = Vector2.new(0.5, 0.5);
     Position = UDim2.new(0.5, 0, 0.5, 0);
-    Size = UDim2.new(0, 200, 0, 200); -- Adjust width/height as needed
+    Size = UDim2.new(0, 250, 0, 250); -- Slightly larger default
     Image = WindowInfo.Watermark or "";
-    ImageTransparency = 0.5;
+    ImageTransparency = WindowInfo.WatermarkTransparency or 0.5;
     ScaleType = Enum.ScaleType.Fit;
-    ZIndex = 0; -- Behind all UI elements
+    ZIndex = 1; -- MUST match Inner frame ZIndex
+    LayoutOrder = -100; -- Forces it behind all tab/groupbox content
     Parent = Inner;
+})
+
+-- Register for theme updates (optional but recommended)
+Library:AddToRegistry(WindowImage, {
+    ImageTransparency = "WatermarkTransparency";
 })
 
 function Window:SetWatermark(AssetId, Transparency)
