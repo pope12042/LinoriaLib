@@ -6587,29 +6587,32 @@ function Library:CreateWindow(...)
         BackgroundColor3 = "MainColor";
         BorderColor3 = "AccentColor";
     })
---// Center Watermark Image (50% transparency) --
+--// Center Watermark (RENDER-FIXED) --
 local WindowImage = Library:Create("ImageLabel", {
     BackgroundTransparency = 1;
     AnchorPoint = Vector2.new(0.5, 0.5);
     Position = UDim2.new(0.5, 0, 0.5, 0);
-    Size = UDim2.new(0, 250, 0, 250); -- Slightly larger default
+    Size = UDim2.new(0, 250, 0, 250);
     Image = WindowInfo.Watermark or "";
     ImageTransparency = WindowInfo.WatermarkTransparency or 0.5;
     ScaleType = Enum.ScaleType.Fit;
-    ZIndex = 1; -- MUST match Inner frame ZIndex
-    LayoutOrder = -100; -- Forces it behind all tab/groupbox content
-    Parent = Inner;
+    ZIndex = 100;          -- ABOVE all tab/groupbox frames
+    Parent = Inner;        -- Still parented to Inner so it moves with window
 })
 
--- Register for theme updates (optional but recommended)
-Library:AddToRegistry(WindowImage, {
-    ImageTransparency = "WatermarkTransparency";
-})
+-- CRITICAL: Move it to the BOTTOM of Inner's children list AFTER all tabs are created
+-- This ensures it renders ON TOP of opaque tab backgrounds
+task.defer(function()
+    if WindowImage and WindowImage.Parent then
+        WindowImage.Parent = Inner  -- Re-parenting forces render order refresh
+    end
+end)
 
 function Window:SetWatermark(AssetId, Transparency)
     WindowImage.Image = AssetId
     WindowImage.ImageTransparency = Transparency or 0.5
 end
+
 
     local WindowLabel = Library:CreateLabel({
         Position = UDim2.new(0, 7, 0, 0);
