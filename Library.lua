@@ -6587,6 +6587,23 @@ function Library:CreateWindow(...)
         BackgroundColor3 = "MainColor";
         BorderColor3 = "AccentColor";
     })
+--// Center Watermark Image (50% transparency) --
+local WindowImage = Library:Create("ImageLabel", {
+    BackgroundTransparency = 1;
+    AnchorPoint = Vector2.new(0.5, 0.5);
+    Position = UDim2.new(0.5, 0, 0.5, 0);
+    Size = UDim2.new(0, 200, 0, 200); -- Adjust width/height as needed
+    Image = WindowInfo.Watermark or "";
+    ImageTransparency = 0.5;
+    ScaleType = Enum.ScaleType.Fit;
+    ZIndex = 0; -- Behind all UI elements
+    Parent = Inner;
+})
+
+function Window:SetWatermark(AssetId, Transparency)
+    WindowImage.Image = AssetId
+    WindowImage.ImageTransparency = Transparency or 0.5
+end
 
     local WindowLabel = Library:CreateLabel({
         Position = UDim2.new(0, 7, 0, 0);
