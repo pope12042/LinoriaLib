@@ -246,7 +246,7 @@ local Library = {
     RiskColor = Color3.fromRGB(255, 50, 50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.RobotoMono,
+    Font = Enum.Font.De,
 
     -- frames --
     OpenedFrames = {};
@@ -8291,6 +8291,48 @@ end
     function Window:SetWatermark(AssetId, Transparency)
         WindowImage.Image = AssetId
         WindowImage.ImageTransparency = Transparency or 0.5
+    end
+    -- ==========================================
+    -- 1. ROUNDED CORNERS FOR THE ENTIRE UI
+    -- ==========================================
+    local WindowCorner = Instance.new("UICorner")
+    WindowCorner.CornerRadius = UDim.new(0, 8) -- Change 8 to adjust roundness
+    WindowCorner.Parent = Outer
+    
+    local InnerCorner = Instance.new("UICorner")
+    InnerCorner.CornerRadius = UDim.new(0, 7) -- Slightly smaller than outer for border effect
+    InnerCorner.Parent = Inner
+
+    -- ==========================================
+    -- 2. CENTER WATERMARK IMAGE (FIXED RENDER)
+    -- ==========================================
+    local WindowImage = Library:Create("ImageLabel", {
+        BackgroundTransparency = 1;
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        Position = UDim2.new(0.5, 0, 0.5, 0);
+        Size = UDim2.new(0, 250, 0, 250);
+        Image = WindowInfo.Watermark or "";
+        ImageTransparency = WindowInfo.WatermarkTransparency or 0.5;
+        ScaleType = Enum.ScaleType.Fit;
+        ZIndex = 100; -- Above all tabs/groupboxes
+        Parent = Inner;
+    })
+
+    -- Force render order refresh AFTER all tabs are created
+    task.defer(function()
+        if WindowImage and WindowImage.Parent then
+            WindowImage.Parent = Inner
+        end
+    end)
+
+    function Window:SetWatermark(AssetId, Transparency)
+        WindowImage.Image = AssetId
+        WindowImage.ImageTransparency = Transparency or 0.5
+    end
+
+    function Window:SetCornerRadius(Radius)
+        WindowCorner.CornerRadius = UDim.new(0, Radius)
+        InnerCorner.CornerRadius = UDim.new(0, Radius - 1)
     end
 
     return Window
