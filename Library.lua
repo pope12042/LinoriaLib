@@ -1084,6 +1084,15 @@ function Library:GiveSignal(Connection: RBXScriptConnection | RBXScriptSignal) -
 end
 
 function Library:Unload()
+    -- Remove blur effect
+    pcall(function()
+        local cam = workspace.CurrentCamera
+        if cam then
+            local blur = cam:FindFirstChild("LinoriaBlur")
+            if blur then blur:Destroy() end
+        end
+    end)
+
     for Idx = #Library.Signals, 1, -1 do
         local Connection = table.remove(Library.Signals, Idx)
         if Connection and Connection.Connected then
@@ -7987,6 +7996,14 @@ end
     local TransparencyCache = {}
     local Toggled = false
     local Fading = false
+    --// Blur effect behind UI (snow/frosted glass) --
+    local BlurEffect = Instance.new("BlurEffect")
+    BlurEffect.Name = "LinoriaBlur"
+    BlurEffect.Size = 0
+    BlurEffect.Enabled = true
+    pcall(function()
+        BlurEffect.Parent = workspace.CurrentCamera
+    end)
     
     function Window:Toggle(Toggling)
         if typeof(Toggling) == "boolean" and Toggling == Toggled then return end
@@ -8001,9 +8018,14 @@ end
             ModalElement.Modal = Library.Toggled
         end
 
-        if Toggled then
-            -- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
-            Outer.Visible = true
+            if Toggled then
+        Outer.Visible = true
+
+        -- Fade blur IN (frosted glass effect)
+        TweenService:Create(BlurEffect, TweenInfo.new(FadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = 8
+        }):Play()
+
 
             if DrawingLib.drawing_replaced ~= true and IsBadDrawingLib ~= true then
                 IsBadDrawingLib = not (pcall(function()
@@ -8098,10 +8120,20 @@ end
             end
         end
 
-        task.wait(FadeTime)
-        Outer.Visible = Toggled
-        Fading = false
+
+    if not Toggled then
+        -- Fade blur OUT
+        TweenService:Create(BlurEffect, TweenInfo.new(FadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size = 0
+        }):Play()
     end
+
+    task.wait(FadeTime)
+    Outer.Visible = Toggled
+    Fading = false
+end
+
+
 
     function Library:Toggle(Toggling)
         return Window:Toggle(Toggling)
@@ -8302,39 +8334,6 @@ end
     local InnerCorner = Instance.new("UICorner")
     InnerCorner.CornerRadius = UDim.new(0, 7) -- Slightly smaller than outer for border effect
     InnerCorner.Parent = Inner
-
-    -- ==========================================
-    -- 2. CENTER WATERMARK IMAGE (FIXED RENDER)
-    -- ==========================================
-    local WindowImage = Library:Create("ImageLabel", {
-        BackgroundTransparency = 1;
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        Size = UDim2.new(0, 250, 0, 250);
-        Image = WindowInfo.Watermark or "";
-        ImageTransparency = WindowInfo.WatermarkTransparency or 0.5;
-        ScaleType = Enum.ScaleType.Fit;
-        ZIndex = 100; -- Above all tabs/groupboxes
-        Parent = Inner;
-    })
-
-    -- Force render order refresh AFTER all tabs are created
-    task.defer(function()
-        if WindowImage and WindowImage.Parent then
-            WindowImage.Parent = Inner
-        end
-    end)
-
-    function Window:SetWatermark(AssetId, Transparency)
-        WindowImage.Image = AssetId
-        WindowImage.ImageTransparency = Transparency or 0.5
-    end
-
-    function Window:SetCornerRadius(Radius)
-        WindowCorner.CornerRadius = UDim.new(0, Radius)
-        InnerCorner.CornerRadius = UDim.new(0, Radius - 1)
-    end
-
     return Window
 end
 
